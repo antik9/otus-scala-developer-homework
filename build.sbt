@@ -4,7 +4,6 @@ version := "0.1"
 
 scalaVersion := "2.13.4"
 
-
 libraryDependencies ++= Seq(
     "org.postgresql"          % "postgresql"                            % "42.2.2"  % Test,
     "org.scalatest"           %% "scalatest"                            % "3.2.3"   % Test,
@@ -17,6 +16,4 @@ libraryDependencies ++= Seq(
     "org.scalacheck"             %% "scalacheck"                % "1.14.3"                  % Test,
     "org.scalatestplus"          %% "scalacheck-1-14"           % "3.2.0.0"           % Test,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3" % Test
-
-
 )
