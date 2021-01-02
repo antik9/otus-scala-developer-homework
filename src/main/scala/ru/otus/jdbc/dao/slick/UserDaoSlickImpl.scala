@@ -19,7 +19,7 @@ class UserDaoSlickImpl(db: Database)(implicit ec: ExecutionContext) {
     db.run(res)
   }
 
-  private[this] def runCreate(user: User): Future[User] = {
+  private[this] def createUserInDb(user: User): Future[User] = {
     val action = for {
       id <- users returning users.map(_.id) += UserRow.fromUser(user)
       newUser = user.copy(id = Some(id))
@@ -35,9 +35,9 @@ class UserDaoSlickImpl(db: Database)(implicit ec: ExecutionContext) {
         case Some(user) => Future {
           user
         }
-        case None => runCreate(user)
+        case None => createUserInDb(user)
       }
-      case None => runCreate(user)
+      case None => createUserInDb(user)
     }
 
   def updateUser(user: User): Future[Unit] = {
@@ -80,7 +80,7 @@ class UserDaoSlickImpl(db: Database)(implicit ec: ExecutionContext) {
     }
   }
 
-  private def findByCondition(condition: Users => Rep[Boolean]): Future[Seq[User]] = {
+  private def findByCondition(condition: Users => Rep[Boolean]): Future[Vector[User]] = {
     val query = for {
       (user, role) <- users
         .filter(condition)
@@ -91,9 +91,11 @@ class UserDaoSlickImpl(db: Database)(implicit ec: ExecutionContext) {
     db.run(query.result).map(serializeUsers)
   }
 
-  def findByLastName(lastName: String): Future[Seq[User]] = findByCondition(_.lastName === lastName)
+  def findByLastName(lastName: String): Future[Seq[User]] =
+    findByCondition(_.lastName === lastName).map(_.toSeq)
 
-  def findAll(): Future[Seq[User]] = findByCondition(_ => true)
+  def findAll(): Future[Seq[User]] =
+    findByCondition(_ => true).map(_.toSeq)
 
   private[this] def serializeUsers(rows: Seq[(UserRow, Option[Role])]): Vector[User] =
     rows.foldLeft(Map.empty[UUID, User]) {

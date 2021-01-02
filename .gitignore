@@ -1,6 +1,7 @@
 .idea
 .metals
 .bloop
+.bsp
 *.swp
 project/target
 project/project
